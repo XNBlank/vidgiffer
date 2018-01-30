@@ -17,6 +17,13 @@ namespace Vid2Gif
         public Form1()
         {
             InitializeComponent();
+            bool check = ExistsOnPath("ffmpeg.exe");
+
+            if ( !check )
+            {
+                MessageBox.Show("ffmpeg.exe is required and could not be found. Make sure it is in your system PATH or in the application directory.", "Error",MessageBoxButtons.OK,MessageBoxIcon.Exclamation,MessageBoxDefaultButton.Button1);
+                Environment.Exit(0);
+            }
         }
 
         private void fileSelect_Click(object sender, EventArgs e)
@@ -55,9 +62,9 @@ namespace Vid2Gif
             string extension = Path.GetExtension(path);
             string output = path.Replace(extension, ".gif");
 
-            
+            string palname = RandomString(12);
 
-            string palcmd = String.Format("-y -ss {0} -t {1} -i \"{2}\" -vf fps={3},scale={4}:-1:flags=lanczos,palettegen palette.png", start, length, path, fps, scale);
+            string palcmd = String.Format("-y -ss {0} -t {1} -i \"{2}\" -vf fps={3},scale={4}:-1:flags=lanczos,palettegen {5}.png", start, length, path, fps, scale, palname);
 
             Console.WriteLine(palcmd);
 
@@ -65,13 +72,49 @@ namespace Vid2Gif
             p.Start();
             p.WaitForExit();
 
-            string cmd = String.Format("-y -ss {0} -t {1} -i \"{2}\" -i palette.png -filter_complex \"fps={3},scale={4}:-1:flags=lanczos[x];[x][1:v]paletteuse\" \"{5}\"", start,length,path,fps,scale,output);
+            string cmd = String.Format("-y -ss {0} -t {1} -i \"{2}\" -i {6}.png -filter_complex \"fps={3},scale={4}:-1:flags=lanczos[x];[x][1:v]paletteuse\" \"{5}\"", start,length,path,fps,scale,output,palname);
 
             Console.WriteLine(cmd);
 
             p.StartInfo.Arguments = "/c ffmpeg " + cmd;
             p.Start();
-            
+            p.WaitForExit();
+
+            if (File.Exists(palname + ".png"))
+            {
+                File.Delete(palname + ".png");
+            }
+
+            MessageBox.Show("Done.", "Info", MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1);
         }
+
+        private static Random random = new Random();
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static bool ExistsOnPath(string fileName)
+        {
+            return GetFullPath(fileName) != null;
+        }
+
+        public static string GetFullPath(string fileName)
+        {
+            if (File.Exists(fileName))
+                return Path.GetFullPath(fileName);
+
+            var values = Environment.GetEnvironmentVariable("PATH");
+            foreach (var path in values.Split(';'))
+            {
+                var fullPath = Path.Combine(path, fileName);
+                if (File.Exists(fullPath))
+                    return fullPath;
+            }
+            return null;
+        }
+
     }
 }

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Vid2Gif")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("VidGiffer")]
+[assembly: AssemblyDescription("A FFMPEG GUI to convert video files to gifs.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Vid2Gif")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCompany("XNBlank")]
+[assembly: AssemblyProduct("VidGiffer")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
